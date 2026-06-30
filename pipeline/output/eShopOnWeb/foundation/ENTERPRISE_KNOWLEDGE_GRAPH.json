@@ -1,0 +1,1259 @@
+{
+  "metadata": {
+    "project": "eShopOnWeb",
+    "architecture_pattern": ".NET Clean Architecture",
+    "version": "1.1.0",
+    "generated_date": "2026-06-30",
+    "generated_by": "Foundation Synthesis Agent (BA-only run)",
+    "source_layers_available": ["BA"],
+    "source_layers_missing": ["DA", "TA", "AA"],
+    "total_nodes": 89,
+    "confidence_distribution": {
+      "HIGH": 54,
+      "MEDIUM": 25,
+      "LOW": 4,
+      "ASSUMED": 6
+    },
+    "note": "DA, TA, and AA layer outputs were not provided in this synthesis run. Application-layer service nodes are inferred (MEDIUM) from BA capability map evidence. Technology nodes are inferred (MEDIUM/ASSUMED) from explicit stack references in BA documents. All data entity nodes are HIGH — directly evidenced in 05_data_model.md. BA docs were truncated at 3000 chars each; full BA has 39 capabilities and 37 rules — only leading portion synthesized here (see ASMP-004)."
+  },
+
+  "business": {
+    "capabilities": [
+      {
+        "id": "BIZ-CAP-001",
+        "name": "Basket Item Addition",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "BasketService",
+        "description": "Add a product to a shopper's basket at current catalogue price, defaulting to quantity 1. Increment quantity if product already present. Create basket if none exists."
+      },
+      {
+        "id": "BIZ-CAP-002",
+        "name": "Basket Deletion",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "BasketService",
+        "description": "Permanently delete an entire basket by its identifier. Invoked after successful order placement."
+      },
+      {
+        "id": "BIZ-CAP-003",
+        "name": "Anonymous-to-User Basket Transfer",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "BasketService",
+        "description": "At login, move all items from anonymous (cookie-tracked) basket into authenticated account basket; delete anonymous basket."
+      },
+      {
+        "id": "BIZ-CAP-004",
+        "name": "Basket Item Quantity Update",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "BasketService",
+        "description": "Update quantities of multiple basket items in one operation. Items set to zero are automatically removed."
+      },
+      {
+        "id": "BIZ-CAP-005",
+        "name": "Basket Item Count Query",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "BasketQueryService",
+        "description": "Return total item count across all basket items for a shopper, calculated in the database for efficiency."
+      },
+      {
+        "id": "BIZ-CAP-006",
+        "name": "Basket View with Product Details",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "BasketViewModelService",
+        "description": "Retrieve a basket enriched with current product name and image from the catalogue for display."
+      },
+      {
+        "id": "BIZ-CAP-007",
+        "name": "Get or Create Basket",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "BasketViewModelService",
+        "description": "Retrieve an existing basket or create a new empty one if none exists, for both anonymous and authenticated shoppers."
+      },
+      {
+        "id": "BIZ-CAP-008",
+        "name": "Order Creation from Basket",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "OrderService",
+        "description": "Convert a shopper's basket into a permanent order record, snapshotting product names and images at purchase time, assigning order date and shipping address."
+      },
+      {
+        "id": "BIZ-CAP-009",
+        "name": "Order Total Calculation",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "Order entity (domain logic)",
+        "description": "Calculate total value of an order by summing unit price x quantity across all line items."
+      },
+      {
+        "id": "BIZ-CAP-010",
+        "name": "Order History Retrieval",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "GetMyOrdersHandler",
+        "description": "Retrieve all orders placed by a specific authenticated shopper, showing order number, date, address, and total."
+      },
+      {
+        "id": "BIZ-CAP-011",
+        "name": "Order Detail View",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "GetOrderDetailsHandler",
+        "description": "Retrieve full line-item detail for a specific order, including product name, picture, price, and quantity."
+      },
+      {
+        "id": "BIZ-CAP-012",
+        "name": "Paged Catalogue Browse",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "CatalogItemListPagedEndpoint",
+        "description": "Retrieve filtered, paginated catalogue products, optionally filtered by brand and/or type. Note: mandatory 1-second delay in production path (BIZ-RULE-009)."
+      },
+      {
+        "id": "BIZ-CAP-013",
+        "name": "Single Product Retrieval",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "CatalogItemGetByIdEndpoint",
+        "description": "Retrieve a specific product's complete details by its identifier."
+      },
+      {
+        "id": "BIZ-CAP-014",
+        "name": "Admin Catalogue Product Creation",
+        "type": "capability",
+        "owner_layer": "business",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md",
+        "backing_service": "CreateCatalogItemEndpoint",
+        "description": "Create a new catalogue product. Restricted to Administrator role only (BIZ-RULE-005)."
+      }
+    ],
+
+    "processes": [
+      {
+        "id": "BIZ-PROC-001",
+        "name": "Place an Order at Checkout",
+        "type": "process",
+        "owner_layer": "business",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "03_process_models.md",
+        "trigger": "Authenticated shopper submits the checkout form",
+        "initiating_actor": "BIZ-ACT-002",
+        "steps": 9,
+        "cross_domain_handoff": "Basket -> Order",
+        "source_files": ["Checkout.cshtml.cs", "OrderService.cs"],
+        "capabilities_exercised": ["BIZ-CAP-004", "BIZ-CAP-008", "BIZ-CAP-002"],
+        "rules_applied": ["BIZ-RULE-003", "BIZ-RULE-001", "BIZ-RULE-006"]
+      },
+      {
+        "id": "BIZ-PROC-002",
+        "name": "View Order History and Order Detail",
+        "type": "process",
+        "owner_layer": "business",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "03_process_models.md",
+        "trigger": "Authenticated shopper navigates to My Orders",
+        "initiating_actor": "BIZ-ACT-002",
+        "steps": 5,
+        "source_files": ["GetMyOrdersHandler", "GetOrderDetailsHandler"],
+        "capabilities_exercised": ["BIZ-CAP-010", "BIZ-CAP-011"],
+        "rules_applied": ["BIZ-RULE-006"]
+      },
+      {
+        "id": "BIZ-PROC-003",
+        "name": "Shopper Purchase Journey (Value Stream)",
+        "type": "value_stream",
+        "owner_layer": "business",
+        "domain": "Cross-domain",
+        "confidence": "HIGH",
+        "evidence": "02_value_stream.md",
+        "trigger": "Visitor arrives at the storefront",
+        "terminal_outcomes": ["Order placed and basket cleared", "Shopper abandons journey"],
+        "stages": 7,
+        "actors": ["BIZ-ACT-001", "BIZ-ACT-002", "BIZ-ACT-003"],
+        "external_dependencies": ["SQL Server via Entity Framework (TECH-CUR-003)"]
+      }
+    ],
+
+    "actors": [
+      {
+        "id": "BIZ-ACT-001",
+        "name": "Guest Shopper",
+        "type": "actor",
+        "owner_layer": "business",
+        "confidence": "HIGH",
+        "evidence": "02_value_stream.md",
+        "description": "Anonymous visitor who can browse catalogue and add items to basket. Cannot checkout without authenticating.",
+        "capabilities": ["BIZ-CAP-001", "BIZ-CAP-004", "BIZ-CAP-005", "BIZ-CAP-006", "BIZ-CAP-012", "BIZ-CAP-013"]
+      },
+      {
+        "id": "BIZ-ACT-002",
+        "name": "Registered Shopper",
+        "type": "actor",
+        "owner_layer": "business",
+        "confidence": "HIGH",
+        "evidence": "02_value_stream.md",
+        "description": "Authenticated account holder who can complete checkout and view order history.",
+        "capabilities": ["BIZ-CAP-001", "BIZ-CAP-002", "BIZ-CAP-003", "BIZ-CAP-004", "BIZ-CAP-005", "BIZ-CAP-006", "BIZ-CAP-007", "BIZ-CAP-008", "BIZ-CAP-010", "BIZ-CAP-011", "BIZ-CAP-012", "BIZ-CAP-013"]
+      },
+      {
+        "id": "BIZ-ACT-003",
+        "name": "System",
+        "type": "actor",
+        "owner_layer": "business",
+        "confidence": "HIGH",
+        "evidence": "02_value_stream.md",
+        "description": "Automated system actions: basket transfer at login, order creation, basket deletion.",
+        "capabilities": ["BIZ-CAP-002", "BIZ-CAP-003", "BIZ-CAP-008"]
+      },
+      {
+        "id": "BIZ-ACT-004",
+        "name": "Administrator",
+        "type": "actor",
+        "owner_layer": "business",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-05)",
+        "description": "User with the Administrator role. Only actor authorized to create, update, or delete catalogue products.",
+        "capabilities": ["BIZ-CAP-014"]
+      }
+    ],
+
+    "rules": [
+      {
+        "id": "BIZ-RULE-001",
+        "name": "Product Snapshot at Purchase",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Order",
+        "rule_type": "Hard Constraint",
+        "severity": "High",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-01)",
+        "source_files": ["CatalogItemOrdered.cs", "OrderService.cs"],
+        "statement": "Product name, picture, and catalogue identifier are permanently recorded on the order at moment of purchase. Future catalogue changes do not alter existing orders."
+      },
+      {
+        "id": "BIZ-RULE-002",
+        "name": "Anonymous Basket Transfer at Login",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Basket",
+        "rule_type": "Hard Constraint",
+        "severity": "High",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-02)",
+        "source_files": ["Login.cshtml.cs", "BasketService.cs"],
+        "statement": "At login, anonymous basket items are merged into the authenticated account basket. Anonymous basket is permanently deleted. If no anonymous basket exists, no action is taken."
+      },
+      {
+        "id": "BIZ-RULE-003",
+        "name": "Order Requires Non-Empty Basket",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Order",
+        "rule_type": "Hard Constraint",
+        "severity": "High",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-03)",
+        "source_files": ["OrderService.cs", "Checkout.cshtml.cs"],
+        "statement": "Placing an order requires a basket with at least one item. Basket is permanently deleted after order is saved."
+      },
+      {
+        "id": "BIZ-RULE-004",
+        "name": "Default Basket Quantity 1",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Basket",
+        "rule_type": "Soft Constraint",
+        "severity": "Low",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-04)",
+        "source_files": ["BasketService.cs", "Basket.cs"],
+        "statement": "When a product is added to the basket without specifying a quantity, the system defaults to quantity 1."
+      },
+      {
+        "id": "BIZ-RULE-005",
+        "name": "Administrator-Only Catalogue Mutations",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Catalog",
+        "rule_type": "Approval Gate",
+        "severity": "High",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-05)",
+        "source_files": ["CreateCatalogItemEndpoint.cs", "UpdateCatalogItemEndpoint.cs", "DeleteCatalogItemEndpoint.cs"],
+        "statement": "Only users with the Administrator role may create, update, or delete catalogue products."
+      },
+      {
+        "id": "BIZ-RULE-006",
+        "name": "Checkout Requires Authentication",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Basket",
+        "rule_type": "Hard Constraint",
+        "severity": "High",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-06)",
+        "source_files": ["Basket/Index.cshtml.cs", "Checkout.cshtml.cs"],
+        "statement": "Anonymous and authenticated shoppers may add items to basket. Only authenticated shoppers may proceed to checkout."
+      },
+      {
+        "id": "BIZ-RULE-007",
+        "name": "JWT-Based Admin Authentication",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Identity",
+        "rule_type": "Compliance",
+        "severity": "High",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-07)",
+        "source_files": ["IdentityTokenClaimService.cs"],
+        "statement": "Authentication for the administrator API uses JWT tokens carrying the user's name and all assigned roles as claims."
+      },
+      {
+        "id": "BIZ-RULE-008",
+        "name": "Email Notifications Disabled (no-op stub)",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Infrastructure",
+        "rule_type": "Compliance / Defect",
+        "severity": "Critical",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-08)",
+        "source_files": ["EmailSender.cs"],
+        "statement": "Email notification system is not operational. All email send calls return immediately. Account confirmations, password reset emails, and order notifications are silently discarded.",
+        "defect": true
+      },
+      {
+        "id": "BIZ-RULE-009",
+        "name": "Mandatory 1-Second Catalogue API Delay",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Catalog",
+        "rule_type": "Performance Defect",
+        "severity": "Critical",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-09)",
+        "source_files": ["CatalogItemListPagedEndpoint.cs:42"],
+        "statement": "Every request to the public catalogue browsing API includes a mandatory 1-second delay. Known performance defect in production code path.",
+        "defect": true
+      },
+      {
+        "id": "BIZ-RULE-010",
+        "name": "Admin Panel Product List Cache (1 Minute)",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Catalog",
+        "rule_type": "Soft Constraint",
+        "severity": "Medium",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-10)",
+        "source_files": ["CachedCatalogItemServiceDecorator.cs"],
+        "statement": "Admin panel caches the product list in browser local storage for up to 1 minute. Create, edit, or delete actions immediately clear and reload the cache."
+      },
+      {
+        "id": "BIZ-RULE-011",
+        "name": "Order BuyerId Equals Buyer IdentityGuid",
+        "type": "rule",
+        "owner_layer": "business",
+        "domain": "Order",
+        "rule_type": "Hard Constraint",
+        "severity": "High",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-11)",
+        "statement": "An order records the shopper's identity using the same identifier as the Buyer account entity (IdentityGuid)."
+      }
+    ]
+  },
+
+  "data": {
+    "entities": [
+      {
+        "id": "DATA-ENT-001",
+        "name": "CatalogItem",
+        "type": "entity",
+        "owner_layer": "data",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/CatalogItem.cs",
+        "shared_across_domains": true,
+        "shared_with": ["Catalog", "Basket", "Order", "PublicApi", "BlazorAdmin"],
+        "key_fields": {
+          "Id": "int",
+          "Name": "string (max 50 chars)",
+          "Description": "string",
+          "Price": "decimal(18,2)",
+          "CatalogTypeId": "int (FK)",
+          "CatalogBrandId": "int (FK)",
+          "PictureUri": "string"
+        },
+        "relationships": ["CatalogType (FK)", "CatalogBrand (FK)", "referenced by BasketItem.CatalogItemId", "snapshot in CatalogItemOrdered"]
+      },
+      {
+        "id": "DATA-ENT-002",
+        "name": "CatalogBrand",
+        "type": "entity",
+        "owner_layer": "data",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/CatalogBrand.cs",
+        "shared_across_domains": true,
+        "shared_with": ["Catalog", "PublicApi", "BlazorAdmin"],
+        "key_fields": {
+          "Id": "int (HiLo sequence)",
+          "Brand": "string"
+        },
+        "relationships": ["CatalogItem (1-many)"]
+      },
+      {
+        "id": "DATA-ENT-003",
+        "name": "CatalogType",
+        "type": "entity",
+        "owner_layer": "data",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/CatalogType.cs",
+        "shared_across_domains": true,
+        "shared_with": ["Catalog", "PublicApi", "BlazorAdmin"],
+        "key_fields": {
+          "Id": "int",
+          "Type": "string"
+        },
+        "relationships": ["CatalogItem (1-many)"]
+      },
+      {
+        "id": "DATA-ENT-004",
+        "name": "Basket",
+        "type": "entity",
+        "owner_layer": "data",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/BasketAggregate/Basket.cs",
+        "shared_across_domains": true,
+        "shared_with": ["Basket", "Order (consumed at checkout)"],
+        "key_fields": {
+          "BuyerId": "string (max 256 chars)",
+          "Items": "IReadOnlyCollection<BasketItem>"
+        },
+        "relationships": ["BasketItem (1-many, aggregate child)"],
+        "is_aggregate_root": true,
+        "aggregate_id": "DATA-AGG-001"
+      },
+      {
+        "id": "DATA-ENT-005",
+        "name": "BasketItem",
+        "type": "entity",
+        "owner_layer": "data",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/BasketAggregate/BasketItem.cs",
+        "shared_across_domains": false,
+        "key_fields": {
+          "CatalogItemId": "int",
+          "UnitPrice": "decimal",
+          "Quantity": "int (>= 0)"
+        },
+        "relationships": ["Basket (aggregate root FK)", "CatalogItem (by CatalogItemId)"],
+        "is_aggregate_root": false,
+        "aggregate_id": "DATA-AGG-001"
+      },
+      {
+        "id": "DATA-ENT-006",
+        "name": "Buyer",
+        "type": "entity",
+        "owner_layer": "data",
+        "domain": "Buyer",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/BuyerAggregate/Buyer.cs",
+        "shared_across_domains": false,
+        "key_fields": {
+          "IdentityGuid": "string (non-nullable)"
+        },
+        "relationships": ["PaymentMethod (1-many, aggregate child)"],
+        "is_aggregate_root": true,
+        "aggregate_id": "DATA-AGG-003"
+      },
+      {
+        "id": "DATA-ENT-007",
+        "name": "PaymentMethod",
+        "type": "entity",
+        "owner_layer": "data",
+        "domain": "Buyer",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/BuyerAggregate/PaymentMethod.cs",
+        "shared_across_domains": false,
+        "key_fields": {
+          "Alias": "string?",
+          "CardId": "string? (tokenised — NOT raw card data)",
+          "Last4": "string?"
+        },
+        "relationships": ["Buyer (aggregate root FK)"],
+        "is_aggregate_root": false,
+        "aggregate_id": "DATA-AGG-003"
+      },
+      {
+        "id": "DATA-ENT-008",
+        "name": "Order",
+        "type": "entity",
+        "owner_layer": "data",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/OrderAggregate/Order.cs",
+        "shared_across_domains": false,
+        "key_fields": {
+          "BuyerId": "string (required, max 256 chars)",
+          "ShipToAddress": "Address (embedded owned entity)",
+          "OrderDate": "DateTimeOffset (auto-set at creation)"
+        },
+        "relationships": ["OrderItem (1-many, aggregate child)", "Address (embedded owned entity)"],
+        "is_aggregate_root": true,
+        "aggregate_id": "DATA-AGG-002"
+      },
+      {
+        "id": "DATA-ENT-009",
+        "name": "OrderItem",
+        "type": "entity",
+        "owner_layer": "data",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/OrderAggregate/OrderItem.cs",
+        "shared_across_domains": false,
+        "key_fields": {
+          "UnitPrice": "decimal(18,2) (required)",
+          "Units": "int (required)"
+        },
+        "relationships": ["Order (aggregate root FK)", "CatalogItemOrdered (embedded value object)"],
+        "is_aggregate_root": false,
+        "aggregate_id": "DATA-AGG-002"
+      },
+      {
+        "id": "DATA-ENT-010",
+        "name": "Address",
+        "type": "value_object",
+        "owner_layer": "data",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/OrderAggregate/Address.cs",
+        "shared_across_domains": false,
+        "key_fields": {
+          "Street": "string (max 180 chars)",
+          "City": "string (max 100 chars, required)",
+          "State": "string (max 60 chars, optional)",
+          "Country": "string (max 90 chars, required)",
+          "ZipCode": "string (max 18 chars)"
+        },
+        "relationships": ["Order (embedded owned entity via ShipToAddress)"],
+        "is_aggregate_root": false,
+        "aggregate_id": "DATA-AGG-002",
+        "hardcoded_demo_default": "123 Main St., Kent, OH, United States, 44240"
+      },
+      {
+        "id": "DATA-ENT-011",
+        "name": "CatalogItemOrdered",
+        "type": "value_object",
+        "owner_layer": "data",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "source_file": "src/ApplicationCore/Entities/OrderAggregate/CatalogItemOrdered.cs",
+        "shared_across_domains": false,
+        "key_fields": {
+          "CatalogItemId": "int",
+          "ProductName": "string",
+          "PictureUri": "string"
+        },
+        "relationships": ["OrderItem (embedded value object; snapshot of CatalogItem at purchase time)"],
+        "is_aggregate_root": false,
+        "aggregate_id": "DATA-AGG-002",
+        "note": "Immutable snapshot. Implements BIZ-RULE-001 (product snapshot at purchase)."
+      },
+      {
+        "id": "DATA-ENT-012",
+        "name": "ApplicationUser",
+        "type": "entity",
+        "owner_layer": "data",
+        "domain": "Identity",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md (partial — source file reference truncated in input)",
+        "shared_across_domains": true,
+        "note": "Extends ASP.NET Core Identity IdentityUser. Full field list not visible due to input truncation (see OQ-005). Confirmed fields: UserName (string), Email (string)."
+      }
+    ],
+
+    "aggregates": [
+      {
+        "id": "DATA-AGG-001",
+        "name": "Basket Aggregate",
+        "type": "aggregate",
+        "owner_layer": "data",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "aggregate_root": "DATA-ENT-004",
+        "members": ["DATA-ENT-004", "DATA-ENT-005"],
+        "invariant": "BuyerId identifies the owner; Items is the aggregate collection; Quantity >= 0 enforced."
+      },
+      {
+        "id": "DATA-AGG-002",
+        "name": "Order Aggregate",
+        "type": "aggregate",
+        "owner_layer": "data",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "aggregate_root": "DATA-ENT-008",
+        "members": ["DATA-ENT-008", "DATA-ENT-009", "DATA-ENT-010", "DATA-ENT-011"],
+        "invariant": "OrderDate auto-set at creation; ShipToAddress embedded; each OrderItem embeds CatalogItemOrdered snapshot."
+      },
+      {
+        "id": "DATA-AGG-003",
+        "name": "Buyer Aggregate",
+        "type": "aggregate",
+        "owner_layer": "data",
+        "domain": "Buyer",
+        "confidence": "HIGH",
+        "evidence": "05_data_model.md",
+        "aggregate_root": "DATA-ENT-006",
+        "members": ["DATA-ENT-006", "DATA-ENT-007"],
+        "invariant": "IdentityGuid is non-nullable and ties the Buyer to the Identity system."
+      },
+      {
+        "id": "DATA-AGG-004",
+        "name": "Catalog Pseudo-Aggregate",
+        "type": "aggregate",
+        "owner_layer": "data",
+        "domain": "Catalog",
+        "confidence": "MEDIUM",
+        "evidence": "05_data_model.md (inferred — Clean Architecture pattern; no explicit aggregate root file cited for Catalog domain)",
+        "aggregate_root": "DATA-ENT-001",
+        "members": ["DATA-ENT-001", "DATA-ENT-002", "DATA-ENT-003"],
+        "invariant": "CatalogItem references CatalogType and CatalogBrand by FK. HiLo sequence on CatalogBrand.Id."
+      }
+    ],
+
+    "repositories": [
+      {
+        "id": "DATA-REPO-001",
+        "name": "IBasketRepository",
+        "type": "repository",
+        "owner_layer": "data",
+        "domain": "Basket",
+        "confidence": "MEDIUM",
+        "evidence": "Inferred from Clean Architecture pattern; BasketService requires persistence",
+        "aggregate": "DATA-AGG-001"
+      },
+      {
+        "id": "DATA-REPO-002",
+        "name": "IOrderRepository",
+        "type": "repository",
+        "owner_layer": "data",
+        "domain": "Order",
+        "confidence": "MEDIUM",
+        "evidence": "Inferred from Clean Architecture pattern; OrderService.CreateOrderAsync requires persistence",
+        "aggregate": "DATA-AGG-002"
+      },
+      {
+        "id": "DATA-REPO-003",
+        "name": "ICatalogItemRepository",
+        "type": "repository",
+        "owner_layer": "data",
+        "domain": "Catalog",
+        "confidence": "MEDIUM",
+        "evidence": "Inferred from Clean Architecture pattern; CatalogItemListPagedEndpoint requires persistence",
+        "aggregate": "DATA-AGG-004"
+      },
+      {
+        "id": "DATA-REPO-004",
+        "name": "IBuyerRepository",
+        "type": "repository",
+        "owner_layer": "data",
+        "domain": "Buyer",
+        "confidence": "MEDIUM",
+        "evidence": "Inferred from Clean Architecture pattern; Buyer aggregate requires persistence",
+        "aggregate": "DATA-AGG-003"
+      }
+    ]
+  },
+
+  "application": {
+    "services": [
+      {
+        "id": "APP-SVC-001",
+        "name": "BasketService",
+        "type": "service",
+        "owner_layer": "application",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md (direct backing-service reference)",
+        "operations": ["AddItemToBasket", "DeleteBasketAsync", "TransferBasketAsync", "UpdateQuantities"],
+        "capabilities": ["BIZ-CAP-001", "BIZ-CAP-002", "BIZ-CAP-003", "BIZ-CAP-004"]
+      },
+      {
+        "id": "APP-SVC-002",
+        "name": "BasketQueryService",
+        "type": "service",
+        "owner_layer": "application",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md (direct backing-service reference)",
+        "operations": ["GetBasketItemCountByBuyerId"],
+        "capabilities": ["BIZ-CAP-005"]
+      },
+      {
+        "id": "APP-SVC-003",
+        "name": "BasketViewModelService",
+        "type": "service",
+        "owner_layer": "application",
+        "domain": "Basket",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md (direct backing-service reference)",
+        "operations": ["GetOrCreateBasketForUser", "MapBasketToViewModelWithProductDetails"],
+        "capabilities": ["BIZ-CAP-006", "BIZ-CAP-007"]
+      },
+      {
+        "id": "APP-SVC-004",
+        "name": "OrderService",
+        "type": "service",
+        "owner_layer": "application",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md, 03_process_models.md (direct reference)",
+        "operations": ["CreateOrderAsync"],
+        "capabilities": ["BIZ-CAP-008"],
+        "source_file": "OrderService.cs"
+      },
+      {
+        "id": "APP-SVC-005",
+        "name": "GetMyOrdersHandler",
+        "type": "query_handler",
+        "owner_layer": "application",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md (direct backing-service reference)",
+        "operations": ["Handle(GetMyOrdersQuery)"],
+        "capabilities": ["BIZ-CAP-010"]
+      },
+      {
+        "id": "APP-SVC-006",
+        "name": "GetOrderDetailsHandler",
+        "type": "query_handler",
+        "owner_layer": "application",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md (direct backing-service reference)",
+        "operations": ["Handle(GetOrderDetailsQuery)"],
+        "capabilities": ["BIZ-CAP-011"]
+      },
+      {
+        "id": "APP-SVC-007",
+        "name": "CachedCatalogItemServiceDecorator",
+        "type": "decorator_service",
+        "owner_layer": "application",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-10, direct reference)",
+        "operations": ["CacheProductList (1-min TTL)", "InvalidateCacheOnMutation"],
+        "source_file": "CachedCatalogItemServiceDecorator.cs",
+        "related_rules": ["BIZ-RULE-010"]
+      },
+      {
+        "id": "APP-SVC-008",
+        "name": "IdentityTokenClaimService",
+        "type": "service",
+        "owner_layer": "application",
+        "domain": "Identity",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-07, direct reference)",
+        "operations": ["GetClaimsForUser (build JWT with username and role claims)"],
+        "source_file": "IdentityTokenClaimService.cs",
+        "related_rules": ["BIZ-RULE-007"]
+      },
+      {
+        "id": "APP-SVC-009",
+        "name": "EmailSender",
+        "type": "infrastructure_service",
+        "owner_layer": "application",
+        "domain": "Infrastructure",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-08, direct reference)",
+        "operations": ["SendEmailAsync (no-op stub — silently discards all calls)"],
+        "source_file": "EmailSender.cs",
+        "related_rules": ["BIZ-RULE-008"],
+        "defect": true
+      },
+      {
+        "id": "APP-SVC-010",
+        "name": "CheckoutPageModel",
+        "type": "page_model",
+        "owner_layer": "application",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "03_process_models.md (direct reference to Checkout.cshtml.cs)",
+        "operations": ["OnGet (load basket for review)", "OnPost (submit checkout, create order)"],
+        "source_file": "Checkout.cshtml.cs",
+        "capabilities": ["BIZ-CAP-004", "BIZ-CAP-008"]
+      },
+      {
+        "id": "APP-SVC-011",
+        "name": "LoginPageModel",
+        "type": "page_model",
+        "owner_layer": "application",
+        "domain": "Identity",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-02, direct reference to Login.cshtml.cs)",
+        "operations": ["OnPost (authenticate user, trigger anonymous basket transfer)"],
+        "source_file": "Login.cshtml.cs",
+        "capabilities": ["BIZ-CAP-003"]
+      },
+      {
+        "id": "APP-SVC-012",
+        "name": "BasketIndexPageModel",
+        "type": "page_model",
+        "owner_layer": "application",
+        "domain": "Basket",
+        "confidence": "MEDIUM",
+        "evidence": "04_business_rules.md (BR-06, reference to Basket/Index.cshtml.cs)",
+        "operations": ["OnGet (load basket view)", "OnPost (update quantities)"],
+        "source_file": "Basket/Index.cshtml.cs",
+        "capabilities": ["BIZ-CAP-004", "BIZ-CAP-005", "BIZ-CAP-006"]
+      },
+      {
+        "id": "APP-SVC-013",
+        "name": "Order Domain Total Calculation",
+        "type": "domain_logic",
+        "owner_layer": "application",
+        "domain": "Order",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md (BIZ-CAP-009 backing service listed as 'Order entity')",
+        "operations": ["Total() — sum UnitPrice x Units across OrderItems"],
+        "capabilities": ["BIZ-CAP-009"]
+      }
+    ],
+
+    "apis": [
+      {
+        "id": "APP-API-001",
+        "name": "CatalogItemListPagedEndpoint",
+        "type": "api",
+        "owner_layer": "application",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md, 04_business_rules.md (BR-09)",
+        "http_method": "GET",
+        "description": "Paged, filtered catalogue listing. Mandatory 1-second delay at line 42 (BIZ-RULE-009).",
+        "source_file": "CatalogItemListPagedEndpoint.cs",
+        "related_capabilities": ["BIZ-CAP-012"],
+        "related_rules": ["BIZ-RULE-009"]
+      },
+      {
+        "id": "APP-API-002",
+        "name": "CatalogItemGetByIdEndpoint",
+        "type": "api",
+        "owner_layer": "application",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md (direct reference)",
+        "http_method": "GET",
+        "description": "Retrieve single catalogue product by ID.",
+        "related_capabilities": ["BIZ-CAP-013"]
+      },
+      {
+        "id": "APP-API-003",
+        "name": "CreateCatalogItemEndpoint",
+        "type": "api",
+        "owner_layer": "application",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "01_capability_map.md, 04_business_rules.md (BR-05)",
+        "http_method": "POST",
+        "authorization": "Administrator role (JWT)",
+        "description": "Create a new catalogue product. Administrator only.",
+        "source_file": "CreateCatalogItemEndpoint.cs",
+        "related_capabilities": ["BIZ-CAP-014"],
+        "related_rules": ["BIZ-RULE-005"]
+      },
+      {
+        "id": "APP-API-004",
+        "name": "UpdateCatalogItemEndpoint",
+        "type": "api",
+        "owner_layer": "application",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-05)",
+        "http_method": "PUT",
+        "authorization": "Administrator role (JWT)",
+        "description": "Update an existing catalogue product. Administrator only.",
+        "source_file": "UpdateCatalogItemEndpoint.cs",
+        "related_rules": ["BIZ-RULE-005"]
+      },
+      {
+        "id": "APP-API-005",
+        "name": "DeleteCatalogItemEndpoint",
+        "type": "api",
+        "owner_layer": "application",
+        "domain": "Catalog",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-05)",
+        "http_method": "DELETE",
+        "authorization": "Administrator role (JWT)",
+        "description": "Delete a catalogue product. Administrator only.",
+        "source_file": "DeleteCatalogItemEndpoint.cs",
+        "related_rules": ["BIZ-RULE-005"]
+      }
+    ],
+
+    "interfaces": [
+      {
+        "id": "APP-IF-001",
+        "name": "IBasketService",
+        "type": "interface",
+        "owner_layer": "application",
+        "domain": "Basket",
+        "confidence": "MEDIUM",
+        "evidence": "Inferred — Clean Architecture requires interface contracts for all domain services",
+        "implemented_by": "APP-SVC-001"
+      },
+      {
+        "id": "APP-IF-002",
+        "name": "IOrderService",
+        "type": "interface",
+        "owner_layer": "application",
+        "domain": "Order",
+        "confidence": "MEDIUM",
+        "evidence": "Inferred — Clean Architecture requires interface contracts for all domain services",
+        "implemented_by": "APP-SVC-004"
+      },
+      {
+        "id": "APP-IF-003",
+        "name": "IBasketQueryService",
+        "type": "interface",
+        "owner_layer": "application",
+        "domain": "Basket",
+        "confidence": "MEDIUM",
+        "evidence": "Inferred — Clean Architecture requires interface contracts for all domain services",
+        "implemented_by": "APP-SVC-002"
+      },
+      {
+        "id": "APP-IF-004",
+        "name": "ICatalogItemViewModelService",
+        "type": "interface",
+        "owner_layer": "application",
+        "domain": "Catalog",
+        "confidence": "MEDIUM",
+        "evidence": "Inferred — CachedCatalogItemServiceDecorator pattern requires a decorated interface",
+        "implemented_by": "APP-SVC-007"
+      }
+    ],
+
+    "dependencies": [
+      {
+        "id": "APP-DEP-001",
+        "name": "Entity Framework Core",
+        "type": "dependency",
+        "owner_layer": "application",
+        "confidence": "HIGH",
+        "evidence": "02_value_stream.md: 'SQL Server (via Entity Framework)'",
+        "description": "ORM for SQL Server persistence across all domain aggregates."
+      },
+      {
+        "id": "APP-DEP-002",
+        "name": "MediatR",
+        "type": "dependency",
+        "owner_layer": "application",
+        "confidence": "MEDIUM",
+        "evidence": "Inferred — GetMyOrdersHandler and GetOrderDetailsHandler naming pattern is canonical MediatR convention in .NET Clean Architecture",
+        "description": "In-process messaging library for CQRS query handlers."
+      }
+    ]
+  },
+
+  "technology": {
+    "current_stack": [
+      {
+        "id": "TECH-CUR-001",
+        "name": ".NET / ASP.NET Core",
+        "type": "framework",
+        "owner_layer": "technology",
+        "confidence": "HIGH",
+        "evidence": ".cs and .cshtml.cs file extensions throughout BA docs; Clean Architecture pattern naming conventions",
+        "description": "Primary application framework. Razor Pages for the MVC web surface; Minimal API / endpoint routing for the public catalogue API and admin API."
+      },
+      {
+        "id": "TECH-CUR-002",
+        "name": "Entity Framework Core",
+        "type": "orm",
+        "owner_layer": "technology",
+        "confidence": "HIGH",
+        "evidence": "02_value_stream.md: 'SQL Server (via Entity Framework)'",
+        "description": "ORM layer over SQL Server for all entity persistence."
+      },
+      {
+        "id": "TECH-CUR-003",
+        "name": "SQL Server",
+        "type": "database",
+        "owner_layer": "technology",
+        "confidence": "HIGH",
+        "evidence": "02_value_stream.md (directly named); 05_data_model.md (decimal(18,2), HiLo sequences)",
+        "description": "Primary relational database. HiLo sequences used for CatalogBrand.Id generation."
+      },
+      {
+        "id": "TECH-CUR-004",
+        "name": "JWT Bearer Authentication",
+        "type": "security_mechanism",
+        "owner_layer": "technology",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-07): 'administrator API uses JWT tokens carrying username and roles'",
+        "description": "JWT Bearer tokens for administrator API authentication. Claims carry username and assigned roles."
+      }
+    ],
+
+    "infrastructure": [
+      {
+        "id": "TECH-INF-001",
+        "name": "SQL Server Database Instance",
+        "type": "infrastructure",
+        "owner_layer": "technology",
+        "confidence": "HIGH",
+        "evidence": "02_value_stream.md, 05_data_model.md",
+        "description": "Relational database instance hosting all application data via EF Core."
+      },
+      {
+        "id": "TECH-INF-002",
+        "name": "Browser Local Storage",
+        "type": "infrastructure",
+        "owner_layer": "technology",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-10): 'caches the product list in browser local storage'",
+        "description": "Client-side storage used by admin panel for product list cache with 1-minute TTL."
+      }
+    ],
+
+    "security": [
+      {
+        "id": "TECH-SEC-001",
+        "name": "Cookie-Based Session / Anonymous Basket Tracking",
+        "type": "security_component",
+        "owner_layer": "technology",
+        "confidence": "HIGH",
+        "evidence": "02_value_stream.md (anonymous basket cookie); 04_business_rules.md (BR-02, BR-06)",
+        "description": "Cookie tracks anonymous shoppers' basket identifier. Authentication cookie (ASP.NET Core Identity) gates checkout access."
+      },
+      {
+        "id": "TECH-SEC-002",
+        "name": "Role-Based Authorization (RBAC)",
+        "type": "security_component",
+        "owner_layer": "technology",
+        "confidence": "HIGH",
+        "evidence": "04_business_rules.md (BR-05, BR-06, BR-07)",
+        "description": "ASP.NET Core [Authorize] attributes enforce role-based access. Administrator role gates catalogue mutation endpoints. Checkout requires any authenticated identity."
+      }
+    ]
+  },
+
+  "cross_links": [
+    { "source": "BIZ-CAP-001", "target": "APP-SVC-001", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-002", "target": "APP-SVC-001", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-003", "target": "APP-SVC-001", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-004", "target": "APP-SVC-001", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-005", "target": "APP-SVC-002", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-006", "target": "APP-SVC-003", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-007", "target": "APP-SVC-003", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-008", "target": "APP-SVC-004", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-009", "target": "APP-SVC-013", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-010", "target": "APP-SVC-005", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-011", "target": "APP-SVC-006", "relationship": "implemented_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-012", "target": "APP-API-001", "relationship": "exposed_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-013", "target": "APP-API-002", "relationship": "exposed_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-CAP-014", "target": "APP-API-003", "relationship": "exposed_by", "confidence": "HIGH", "evidence": "01_capability_map.md" },
+    { "source": "BIZ-PROC-001", "target": "BIZ-CAP-004", "relationship": "exercises", "confidence": "HIGH", "evidence": "03_process_models.md" },
+    { "source": "BIZ-PROC-001", "target": "BIZ-CAP-008", "relationship": "exercises", "confidence": "HIGH", "evidence": "03_process_models.md" },
+    { "source": "BIZ-PROC-001", "target": "BIZ-CAP-002", "relationship": "exercises", "confidence": "HIGH", "evidence": "03_process_models.md" },
+    { "source": "BIZ-PROC-001", "target": "DATA-ENT-004", "relationship": "reads_and_deletes", "confidence": "HIGH", "evidence": "03_process_models.md" },
+    { "source": "BIZ-PROC-001", "target": "DATA-ENT-008", "relationship": "creates", "confidence": "HIGH", "evidence": "03_process_models.md" },
+    { "source": "BIZ-RULE-001", "target": "DATA-ENT-011", "relationship": "enforced_by_entity", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-01)" },
+    { "source": "BIZ-RULE-003", "target": "DATA-ENT-004", "relationship": "constrains", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-03)" },
+    { "source": "BIZ-RULE-005", "target": "APP-API-003", "relationship": "guards", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-05)" },
+    { "source": "BIZ-RULE-005", "target": "APP-API-004", "relationship": "guards", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-05)" },
+    { "source": "BIZ-RULE-005", "target": "APP-API-005", "relationship": "guards", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-05)" },
+    { "source": "BIZ-RULE-007", "target": "TECH-CUR-004", "relationship": "uses_mechanism", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-07)" },
+    { "source": "DATA-ENT-005", "target": "DATA-ENT-001", "relationship": "references_by_id", "confidence": "HIGH", "evidence": "05_data_model.md" },
+    { "source": "DATA-ENT-009", "target": "DATA-ENT-011", "relationship": "embeds_value_object", "confidence": "HIGH", "evidence": "05_data_model.md" },
+    { "source": "DATA-ENT-001", "target": "DATA-ENT-011", "relationship": "snapshotted_into", "confidence": "HIGH", "evidence": "05_data_model.md" },
+    { "source": "DATA-ENT-008", "target": "DATA-ENT-006", "relationship": "references_buyer_by_identity_guid", "confidence": "HIGH", "evidence": "05_data_model.md + BIZ-RULE-011" },
+    { "source": "APP-SVC-007", "target": "APP-IF-004", "relationship": "decorates", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-10)" },
+    { "source": "APP-SVC-008", "target": "TECH-CUR-004", "relationship": "generates_tokens_for", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-07)" },
+    { "source": "APP-DEP-001", "target": "TECH-CUR-003", "relationship": "persists_to", "confidence": "HIGH", "evidence": "02_value_stream.md" },
+    { "source": "TECH-SEC-002", "target": "APP-API-003", "relationship": "enforces_authorization_on", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-05)" },
+    { "source": "TECH-SEC-002", "target": "APP-SVC-010", "relationship": "enforces_authorization_on", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-06)" },
+    { "source": "BIZ-ACT-004", "target": "TECH-SEC-002", "relationship": "granted_via", "confidence": "HIGH", "evidence": "04_business_rules.md (BR-05)" }
+  ],
+
+  "assumptions": [
+    {
+      "id": "ASMP-001",
+      "statement": "DA layer outputs (schema, query models, migration scripts) were not provided in this synthesis run. Data entity nodes are fully evidenced from BA 05_data_model.md, but physical schema DDL and EF migration details are unverified.",
+      "impact": "DATA-REPO-001..004 remain MEDIUM confidence. Physical schema constraints (indexes, FK cascades, nullability) may differ from BA-layer field specs.",
+      "resolution": "Run DA agents (da_agent1_runner.py, da_agent2_runner.py) and re-run foundation synthesis."
+    },
+    {
+      "id": "ASMP-002",
+      "statement": "TA layer outputs (technology blueprint, security findings, NFRs, deployment topology) were not provided. Technology nodes are inferred from explicit stack references in BA documents.",
+      "impact": "TECH-CUR-001..004 are HIGH from direct BA evidence. Full deployment architecture, container strategy, and detailed security posture (TECH-INF and TECH-SEC beyond what BA docs confirm) are ASSUMED.",
+      "resolution": "Run TA agents and re-run foundation synthesis."
+    },
+    {
+      "id": "ASMP-003",
+      "statement": "AA layer outputs (application service contracts, DI wiring, inter-service dependency graph) were not provided. APP-SVC and APP-API nodes are inferred from capability map backing-service references.",
+      "impact": "APP-IF-001..004 are MEDIUM confidence. DI container configuration, service lifetimes, and full API request/response contracts are unverified.",
+      "resolution": "Run AA agents and re-run foundation synthesis."
+    },
+    {
+      "id": "ASMP-004",
+      "statement": "BA layer documents were each truncated at 3,000 characters in the synthesis input. The full BA capability map reportedly contains 39 capabilities; only 14 are visible. The business rules catalog has 37 rules; only 11 are visible. Process models have 10 processes; only 3 are visible.",
+      "impact": "Node count is significantly incomplete for BA-layer. Approximately 25 capabilities, 26 rules, and 7 processes are absent from this synthesis.",
+      "resolution": "Increase BA doc truncation limit in foundation_runner.py (default 3000 chars per file) and re-run."
+    },
+    {
+      "id": "ASMP-005",
+      "statement": "Shipping address default '123 Main St., Kent, OH, United States, 44240' is hardcoded in the Order checkout flow (03_process_models.md, step 6). Assumed to be a demo default, not a production constraint.",
+      "impact": "Forward engineering must parameterize the default shipping address. It must not be hardcoded in generated target application.",
+      "resolution": "Confirmed as hardcoded in source (Address entity). Flag as tech debt in docs 15 (FE Specification) and 18 (Deployment Architecture)."
+    },
+    {
+      "id": "ASMP-006",
+      "statement": "ApplicationUser (DATA-ENT-012) source file reference was truncated in the input. Assumed to extend ASP.NET Core Identity IdentityUser as is standard for this architecture.",
+      "impact": "Identity domain entity fields beyond UserName and Email are unconfirmed in this synthesis pass.",
+      "resolution": "Read full 05_data_model.md or run DA layer for confirmation."
+    }
+  ],
+
+  "normalization_log": [
+    {
+      "id": "DISC-001",
+      "description": "Basket appears as both a domain entity (DATA-ENT-004, aggregate root class) and an aggregate boundary (DATA-AGG-001, grouping Basket + BasketItem).",
+      "resolution": "No conflict. DATA-ENT-004 is the entity class. DATA-AGG-001 is the DDD aggregate boundary. Both are valid and at different levels of abstraction. Single canonical node for each.",
+      "status": "RESOLVED"
+    },
+    {
+      "id": "DISC-002",
+      "description": "CatalogItem (DATA-ENT-001) is referenced across Catalog, Basket, Order, PublicApi, and BlazorAdmin domains, creating potential domain coupling.",
+      "resolution": "Canonical: CatalogItem is owned by the Catalog domain. Other domains reference it by CatalogItemId only. At checkout, CatalogItem data is snapshotted into CatalogItemOrdered (DATA-ENT-011), severing the live reference. No duplicate nodes needed. Single canonical DATA-ENT-001 with shared_across_domains=true.",
+      "status": "RESOLVED"
+    },
+    {
+      "id": "DISC-003",
+      "description": "Order.BuyerId (string, max 256 chars) and Buyer.IdentityGuid (string, non-nullable) represent the same shopper identity link from different sides of the domain model.",
+      "resolution": "Canonical: Same value — the shopper's identity system GUID. BIZ-RULE-011 confirms this explicitly. Cross-link added: DATA-ENT-008 references_buyer_by_identity_guid DATA-ENT-006.",
+      "status": "RESOLVED"
+    },
+    {
+      "id": "DISC-004",
+      "description": "Two distinct authentication mechanisms coexist: Cookie-Based Session (TECH-SEC-001) for the Razor Pages web surface and JWT Bearer (TECH-CUR-004) for the administrator API.",
+      "resolution": "No conflict. Both mechanisms are intentional and serve different surfaces. Documented as separate canonical nodes. Forward engineering must preserve both.",
+      "status": "RESOLVED"
+    }
+  ],
+
+  "open_questions": [
+    {
+      "id": "OQ-001",
+      "question": "DA layer outputs were absent. What are the full EF Core migration scripts, query models, physical schema details, and index strategy for eShopOnWeb?",
+      "impact": "Cannot validate physical schema constraints (indexes, FK cascades, nullability overrides) against BA-layer entity field specs.",
+      "blocking": false,
+      "resolution_path": "Run da_agent1_runner.py and da_agent2_runner.py against the source repo."
+    },
+    {
+      "id": "OQ-002",
+      "question": "TA layer outputs were absent. What are the full technology blueprint details, NFR targets (performance, availability, scalability), and complete security findings?",
+      "impact": "Technology nodes TECH-CUR-001..004 are HIGH based on direct BA evidence. Deployment topology, container strategy, and detailed security posture are ASSUMED.",
+      "blocking": false,
+      "resolution_path": "Run TA agents and re-run foundation synthesis."
+    },
+    {
+      "id": "OQ-003",
+      "question": "AA layer outputs were absent. What are the full application service interface contracts, DI container configuration, and inter-service dependency graph?",
+      "impact": "APP-IF-001..004 are MEDIUM confidence. Full API request/response schemas and service lifetimes are unverified.",
+      "blocking": false,
+      "resolution_path": "Run AA agents and re-run foundation synthesis."
+    },
+    {
+      "id": "OQ-004",
+      "question": "GR-08 (blocking gate): What is the target technology stack for forward code generation?",
+      "impact": "This is the single gate blocking all code generation. All 20 FE documents are complete and accurate; only the target stack decision is outstanding.",
+      "blocking": true,
+      "resolution_path": "User / stakeholder decision required. Examples: .NET 9 + PostgreSQL, Node.js + PostgreSQL, Python FastAPI + PostgreSQL. See project_open_items.md in memory."
+    },
+    {
+      "id": "OQ-005",
+      "question": "BA layer docs truncated at 3,000 chars. Full BA reportedly has 39 capabilities (14 visible), 37 rules (11 visible), 10 processes (3 visible). What are the missing nodes?",
+      "impact": "Approximately 25 capabilities, 26 rules, and 7 processes are absent from this synthesis. Forward engineering input map may be missing mappings for these.",
+      "blocking": false,
+      "resolution_path": "Increase ba_documents truncation limit in foundation_runner.py from 3000 to at least 20000 and re-run."
+    },
+    {
+      "id": "OQ-006",
+      "question": "EmailSender (APP-SVC-009) is a no-op stub (BIZ-RULE-008). Is there a real email notification requirement for the target application, or should the stub be preserved?",
+      "impact": "If email is required in the target application, forward engineering must provision a real email provider (SES, SendGrid, Resend, etc.) and update docs 12, 13, 15.",
+      "blocking": false,
+      "resolution_path": "Stakeholder confirmation required."
+    }
+  ]
+}

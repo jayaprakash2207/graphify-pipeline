@@ -1,0 +1,47 @@
+# Graphify Pipeline — Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# ── Core HTTP and config parsing ──────────────────────────────────────────────
+PyYAML>=6.0
+requests>=2.28.0
+
+# ── Git repository cloning ────────────────────────────────────────────────────
+# Used by input_resolver.py to clone GitHub/GitLab/Bitbucket URLs
+GitPython>=3.1.40
+
+# ── Archive handling ──────────────────────────────────────────────────────────
+# Used by input_resolver.py to unzip uploaded archives
+# (zipfile is stdlib; patool handles .tar.gz and other formats)
+patool>=2.0.0
+
+# ── JSON and data handling ────────────────────────────────────────────────────
+# ujson is an optional fast JSON backend; stdlib json is the fallback
+ujson>=5.7.0
+
+# ── Path and filesystem utilities ─────────────────────────────────────────────
+# pathlib is stdlib (Python 3.4+); no extra install needed
+
+# ── Subprocess / CLI orchestration ───────────────────────────────────────────
+# subprocess is stdlib; no extra install needed
+
+# ── Progress display ──────────────────────────────────────────────────────────
+tqdm>=4.65.0
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+# logging is stdlib; no extra install needed
+
+# ── Optional: XML config parsing (.csproj, web.config, pom.xml) ──────────────
+lxml>=4.9.0
+
+# ── Optional: .env file support ───────────────────────────────────────────────
+python-dotenv>=1.0.0
+
+# ── Graphify (AST graph engine) ───────────────────────────────────────────────
+# Install separately: pip install graphify-ai
+# Listed here for documentation; pinning omitted as versions evolve
+# graphify-ai>=0.1.0
+
+# ── Claude Code CLI ───────────────────────────────────────────────────────────
+# Install via npm, not pip:
+#   npm install -g @anthropic/claude-code
+#   claude login
