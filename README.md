@@ -295,3 +295,10 @@ graphify-pipeline/
 | Application Architecture | ~95% | 32/32 quality checks pass |
 | Foundation Knowledge Graph | ~92% | 95% HIGH confidence nodes |
 | **Overall** | **~88-92%** | |
+
+---
+
+## Changelog
+
+### v1.1 (2026-07-06)
+- **Token cost reduction (~30–40%)** — DA and TA agent prompts now read from Layer 1 JSON first instead of re-reading the same source files that BA already extracted. Same output, lower cost.
