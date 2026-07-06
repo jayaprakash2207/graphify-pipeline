@@ -29,20 +29,35 @@ description: Full data architecture reverse engineering. Use when user says "rev
 
 ---
 
+## Layer 1 JSON — Use This First
+
+Layer 1 has already extracted the following structured JSON — **use these instead of reading raw source files directly**:
+
+| File | Contains | Use for |
+|---|---|---|
+| `source_code.json` | All classes, methods, fields, namespaces | Entity fields, service signatures, repositories |
+| `database.json` | Tables, columns, relationships, indexes | Schema, ERD, FK rules |
+| `config.json` | All config keys and values | Connection strings, feature flags, cache settings |
+| `logs.json` | Log patterns and levels | Audit trails, event patterns |
+
+Only read raw source files directly for: migration file chronological ordering, raw SQL queries, and any item marked `unknown` or missing from the Layer 1 JSON.
+
+---
+
 ## Steps
 
 **Phase 0 — Auto-Detection** *(always first, no files opened yet)*
-1. Scan folder structure — detect language, framework, ORM, database engine, migration tool
-2. Extract ALL connection strings from config files — record host, port, database name, username
-3. List all entity files, route files, config files, integration clients
+1. Load `source_code.json` and `database.json` from Layer 1 — detect language, framework, ORM, database engine from these
+2. Extract connection strings from `config.json` (Layer 1) — record host, port, database name, username. Only open raw config files if a connection string is missing or marked unknown.
+3. List all entity files, route files, config files, integration clients — use `source_code.json` index, not a folder scan
 4. Produce a chunk plan — one chunk per domain
 
-**Phase 1 — Code Discovery** *(read entities, migrations, services, queries)*
-1. Read all entity/model classes — fields, types, validation rules, relationships
-2. Read all migration files chronologically — columns, indexes, FK rules, sequences
-3. Read all repository and query classes — specifications, raw SQL, N+1 risks
-4. Read service classes — transaction boundaries, business rules in constructors
-5. **Mandatory spot check** — read at least 5 files from: `*/Config*` `*/Extensions*` `*/HealthChecks*` `*/Cache*` `*/Background*` — look for caching layers, feature flags, background DB writers, and health check dependencies
+**Phase 1 — Code Discovery** *(use Layer 1 JSON first, read source files only for gaps)*
+1. Use `source_code.json` for entity/model classes — fields, types, relationships are already extracted. Only open a source file if a field is marked `unknown` or a relationship is ambiguous.
+2. Read all migration files chronologically — columns, indexes, FK rules, sequences (Layer 1 does not extract migration order — read these directly)
+3. Read all repository and query classes — specifications, raw SQL, N+1 risks (raw SQL is not in Layer 1 — read these directly)
+4. Use `source_code.json` for service class signatures — transaction boundaries visible from method signatures. Only open service source files if method bodies are needed for constructor business rules.
+5. **Mandatory spot check** — use `config.json` (Layer 1) for `*/Config*` `*/Extensions*` `*/Cache*` settings. Only open `*/HealthChecks*` and `*/Background*` files directly as these are not fully extracted by Layer 1.
 6. **Business-meaning & governance capture** — read XML doc comments, README/glossary text, validation messages, `[Authorize]` attributes and role/policy names, and check for soft-delete flags or audit columns (`IsDeleted`, `CreatedAt`, etc.). This evidence feeds the data dictionary, conceptual model, retention policy, and access control matrix.
 7. **Canonical / shadow entity detection** — for every business concept that appears more than once (e.g. "customer" represented as `AspNetUsers`, `Buyer`, and a loose `BuyerId` string), identify which representation is canonical (source of truth) and which are shadow/duplicate. Check whether each representation is actually constructed/queried anywhere — an entity that is only ever defined but never instantiated is a strong shadow signal.
 
